@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Compile Python sources
+        run: python3 -m py_compile install.py skills/anything-to-journal/scripts/*.py tests/*.py
+      - name: Run synthetic pipeline tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Check canonical skill shape
+        run: |
+          test -f skills/anything-to-journal/SKILL.md
+          test -f skills/anything-to-journal/agents/openai.yaml
+          test "$(find skills -name SKILL.md | wc -l | tr -d ' ')" = "1"

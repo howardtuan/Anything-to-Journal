@@ -1,0 +1,4 @@
+interface:
+  display_name: "Anything to Journal"
+  short_description: "Turn any source folder into an editable journal manuscript"
+  default_prompt: "Use $anything-to-journal to turn this source-material folder into a journal manuscript."

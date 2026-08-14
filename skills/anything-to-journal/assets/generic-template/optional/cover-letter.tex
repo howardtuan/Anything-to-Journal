@@ -1,0 +1,29 @@
+\documentclass[11pt]{letter}
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{lmodern}
+\else
+  \usepackage{fontspec}
+  \IfFontExistsTF{TeX Gyre Termes}{\setmainfont{TeX Gyre Termes}}{\setmainfont{Latin Modern Roman}}
+\fi
+\signature{[[CORRESPONDING AUTHOR NAME REQUIRED]]}
+\address{[[AFFILIATION AND ADDRESS REQUIRED]]}
+
+\begin{document}
+\begin{letter}{Editor-in-Chief\\[[TARGET JOURNAL REQUIRED]]}
+\opening{Dear Editor-in-Chief,}
+
+Please consider our manuscript entitled ``[[ENGLISH TITLE REQUIRED]]'' for publication as a [[ARTICLE TYPE REQUIRED]] in \emph{[[TARGET JOURNAL REQUIRED]]}.
+
+[[ONE PARAGRAPH ON THE RESEARCH QUESTION, METHODS, PRINCIPAL QUANTITATIVE FINDINGS, AND SIGNIFICANCE REQUIRED. DO NOT OVERSTATE NOVELTY.]]
+
+[[ORIGINALITY, AUTHOR APPROVAL, CONFLICT-OF-INTEREST, PRIOR-PUBLICATION/SOURCE PROVENANCE, AND RELATED-MANUSCRIPT STATEMENTS REQUIRED.]]
+
+Thank you for your consideration.
+
+\closing{Sincerely,}
+\end{letter}
+\end{document}

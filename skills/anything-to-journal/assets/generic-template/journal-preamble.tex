@@ -1,0 +1,46 @@
+% Generic single-column journal submission preamble.
+% Replace this file only when a target journal or conference requires its official class.
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{lmodern}
+\else
+  \usepackage{fontspec}
+  \defaultfontfeatures{Ligatures=TeX}
+  \IfFontExistsTF{TeX Gyre Termes}{\setmainfont{TeX Gyre Termes}}{%
+    \IfFontExistsTF{Latin Modern Roman}{\setmainfont{Latin Modern Roman}}{}%
+  }
+\fi
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+\usepackage{array}
+\usepackage{siunitx}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{lineno}
+\usepackage{indentfirst}
+\usepackage[section]{placeins}
+\usepackage[export]{adjustbox}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+
+\setstretch{1.5}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\captionsetup[figure]{position=bottom}
+\captionsetup[table]{position=top}
+\graphicspath{{./}}
+\sisetup{detect-all,group-separator={,}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\sourceid}[1]{\texttt{#1}}
+% Invisible audit wrapper: retain each source-cell ID while translating/reformatting tables.
+\newcommand{\sourcecell}[2]{#2}

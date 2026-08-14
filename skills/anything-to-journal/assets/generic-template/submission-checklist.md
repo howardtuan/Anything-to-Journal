@@ -1,0 +1,27 @@
+# Author submission checklist
+
+- [ ] All authors approve the English manuscript and author order.
+- [ ] The target journal/conference and article type, or explicit draft-only mode, are confirmed before preparation.
+- [ ] The current official Guide for Authors was checked and recorded.
+- [ ] Every exact source-figure asset remains unchanged in the project; each figure occurrence is typeset exactly once using either the original or one verified derivative, and every source table is present exactly once.
+- [ ] Every figure/table caption, unit, value, note, and significance marker was checked against its source material.
+- [ ] Figure captions are below figures; table captions are above tables.
+- [ ] Every figure/table is placed beside its substantive in-text callout, with no end-of-manuscript float dump.
+- [ ] Body paragraphs use a 2em first-line indent and no extra paragraph spacing.
+- [ ] The complete manuscript PDF, including references, is at most 19 pages and all visuals remain readable.
+- [ ] Every in-text citation resolves to a verified bibliography record.
+- [ ] Every BibTeX/cited key and every typeset figure/table/equation also has a reverse source mapping; no source-free item was added.
+- [ ] Every verified citation occurrence, equation, footnote, and endnote has exactly one `TRACE:SRC` marker in compiled LaTeX.
+- [ ] Every quantitative prose claim has a verified `evidence-map.csv` row and matching adjacent `EVIDENCE:CLAIM` marker.
+- [ ] `source-render.pdf` was inspected page by page; its hash, renderer, reviewer, review time, and complete page list are recorded in `source-render-review.json`.
+- [ ] Any citation/bibliography detector miss has a page-complete `source-recovery.json` attestation whose final hash is author-approved.
+- [ ] Combined citations use one marker line listing all source occurrence IDs, and each ledger `output_id` lists only that occurrence's BibTeX keys.
+- [ ] Source provenance, prior publications, and reused copyrighted material are disclosed.
+- [ ] Ethics, consent, funding, conflicts, author contributions, and data availability are accurate.
+- [ ] Any journal-required generative-AI disclosure was checked against the current policy.
+- [ ] All rendered PDF pages were visually inspected, with reviewer and review time recorded.
+- [ ] `author-decisions.json` resolves every required decision, records `all_authors_approved.value: true`, and matches the final manuscript source/PDF/recovery hashes.
+- [ ] `format-decision.json` records the user's target journal/conference guidance or explicit draft-only choice made before preparation.
+- [ ] `submission/submission-package.zip` contains the complete source, manuscript, reports, and final submission outputs.
+- [ ] `reports/quality-report.md` contains zero errors and no unresolved ledger rows.
+- [ ] The author, not the agent, performs the final submission.

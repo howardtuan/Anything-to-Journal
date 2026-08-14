@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If this skill supports your research workflow, please cite the software release."
+title: "Anything to Journal"
+type: software
+authors:
+  - name: "Anything-to-Journal contributors"
+version: 1.0.0
+date-released: 2026-08-14
+license: MIT
