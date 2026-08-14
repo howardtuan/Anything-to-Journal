@@ -6,7 +6,7 @@
 
 <p align="center">把一個研究資料夾裡的任何素材，整理成來源可追蹤的 Journal 稿件、可編輯 LaTeX 專案、逐頁檢查過的 PDF，以及可直接上傳 Overleaf 的單一 ZIP。</p>
 
-<p align="center"><a href="README.md">English</a></p>
+<p align="center"><a href="https://anything-to-journal-website.howardtuan.workers.dev/">官方網站</a> · <a href="README.md">English</a></p>
 
 # Anything to Journal
 

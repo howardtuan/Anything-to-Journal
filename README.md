@@ -6,7 +6,7 @@
 
 <p align="center">Turn anything in one research folder into an evidence-traceable journal manuscript, editable LaTeX project, inspected PDF, and one-file Overleaf upload.</p>
 
-<p align="center"><a href="README.zh-TW.md">繁體中文</a></p>
+<p align="center"><a href="https://anything-to-journal-website.howardtuan.workers.dev/">Website</a> · <a href="README.zh-TW.md">繁體中文</a></p>
 
 # Anything to Journal
 
