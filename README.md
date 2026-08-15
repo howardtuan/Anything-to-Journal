@@ -63,7 +63,43 @@ Keep all material for one manuscript together. Do not place unrelated projects o
 
 ### 2. Install the skill
 
-From this repository:
+#### Recommended — install with npx
+
+Node.js 18 or newer is required. Install the latest published release with:
+
+```bash
+npx anything-to-journal@latest install
+```
+
+The default destination is `$CODEX_HOME/skills/anything-to-journal`, or `~/.codex/skills/anything-to-journal` when `CODEX_HOME` is unset. Restart Codex only if the skill does not appear automatically.
+
+To update an existing installation later, run:
+
+```bash
+npx anything-to-journal@latest update
+```
+
+`install` never overwrites an existing target. `update` first verifies that the destination is an Anything-to-Journal skill, stages the new release, and then replaces the old copy atomically.
+
+For a repository-local installation under `.agents/skills`, use:
+
+```bash
+npx anything-to-journal@latest install --repo /absolute/path/to/repository
+```
+
+Use `--destination /absolute/path/to/skills` for another explicit skills directory. Run `npx anything-to-journal@latest --help` for all options.
+
+#### Ask your agent to install it
+
+Copy this repository URL and send it to your agent:
+
+```text
+Please install this Agent Skill for me: https://github.com/howardtuan/Anything-to-Journal
+```
+
+#### Contributor install from a clone
+
+Clone this repository, then run:
 
 ```bash
 python3 install.py
@@ -79,10 +115,10 @@ Use `python3 install.py --mode copy` for a standalone copy, or `--repo /path/to/
 
 ### 3. Ask the agent
 
-Open the fresh material folder and invoke:
+Open the fresh material folder, invoke the skill, and add your request after the skill name. For example:
 
 ```text
-$anything-to-journal Turn everything in this folder into a journal manuscript.
+/skill Anything-to-Journal Turn everything in this folder into a journal manuscript.
 ```
 
 Before reading the materials, the agent asks you to choose:
@@ -201,6 +237,7 @@ Unless a confirmed official template imposes a stricter compatible rule, the wor
 
 ## Requirements
 
+- Node.js 18 or newer for the npx installer;
 - Python 3.10 or newer;
 - a TeX engine: Tectonic is preferred, with XeLaTeX or LuaLaTeX supported;
 - optional Pandoc for rich DOCX semantic conversion;
@@ -214,12 +251,28 @@ python3 skills/anything-to-journal/scripts/doctor.py
 
 ## Development
 
-Run the synthetic test suite and skill validator:
+Run the npx installer tests, synthetic skill tests, and skill validator:
 
 ```bash
+npm test
 python3 -m unittest discover -s tests -v
 python3 /path/to/skill-creator/scripts/quick_validate.py skills/anything-to-journal
 ```
+
+Inspect the exact npm package contents before releasing:
+
+```bash
+npm pack --dry-run
+```
+
+Maintainers must publish a new semantic version before `@latest` can deliver an update:
+
+```bash
+npm version patch
+npm publish
+```
+
+The `prepublishOnly` check runs both the npx installer tests and the synthetic skill suite. Never reuse an already published npm version.
 
 Fixtures must be synthetic. Never commit a user's unpublished sources, private data, copyrighted publisher template, or confidential results.
 

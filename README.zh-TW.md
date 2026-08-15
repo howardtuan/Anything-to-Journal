@@ -63,7 +63,43 @@ my-paper-materials/
 
 ### 2. 安裝技能
 
-在本專案執行：
+#### 建議方法：使用 npx 安裝
+
+需要 Node.js 18 以上版本。用以下指令安裝 npm 上最新發布版本：
+
+```bash
+npx anything-to-journal@latest install
+```
+
+預設會安裝至 `$CODEX_HOME/skills/anything-to-journal`；若未設定 `CODEX_HOME`，則是 `~/.codex/skills/anything-to-journal`。若技能沒有自動出現，再重新啟動 Codex 即可。
+
+未來要更新既有安裝時執行：
+
+```bash
+npx anything-to-journal@latest update
+```
+
+`install` 絕不覆寫既有目的地；`update` 會先確認目的地確實是 Anything-to-Journal，將新版放入暫存位置，再以原子操作取代舊版。
+
+若要安裝至單一 repo 的 `.agents/skills`，可使用：
+
+```bash
+npx anything-to-journal@latest install --repo /absolute/path/to/repository
+```
+
+其他指定技能目錄可使用 `--destination /absolute/path/to/skills`。執行 `npx anything-to-journal@latest --help` 可查看全部選項。
+
+#### 請 agent 安裝
+
+複製本 repo 連結並傳給 agent：
+
+```text
+請幫我安裝這個 Agent Skill：https://github.com/howardtuan/Anything-to-Journal
+```
+
+#### Contributor 從 clone 安裝
+
+Clone 本 repo 後執行：
 
 ```bash
 python3 install.py
@@ -79,10 +115,10 @@ python3 install.py
 
 ### 3. 交給 agent
 
-開啟剛建立的素材資料夾，呼叫：
+開啟剛建立的素材資料夾，輸入 `/skill Anything-to-Journal`，並在後面加上你的問題或需求。例如：
 
 ```text
-$anything-to-journal 把這個資料夾裡的所有素材做成 Journal 稿件。
+/skill Anything-to-Journal 把這個資料夾裡的所有素材做成 Journal 稿件。
 ```
 
 在讀取素材前，agent 會先請你選：
@@ -201,6 +237,7 @@ python3 skills/anything-to-journal/scripts/preflight.py source-document.docx --s
 
 ## 需求
 
+- npx 安裝器需要 Node.js 18 以上版本；
 - Python 3.10 以上；
 - TeX 引擎：優先 Tectonic，也支援 XeLaTeX 或 LuaLaTeX；
 - 選用 Pandoc 進行豐富的 DOCX 語意轉換；
@@ -214,12 +251,28 @@ python3 skills/anything-to-journal/scripts/doctor.py
 
 ## 開發
 
-執行合成測試與技能驗證器：
+執行 npx 安裝器測試、合成技能測試與技能驗證器：
 
 ```bash
+npm test
 python3 -m unittest discover -s tests -v
 python3 /path/to/skill-creator/scripts/quick_validate.py skills/anything-to-journal
 ```
+
+發布前先檢查 npm 套件實際包含的檔案：
+
+```bash
+npm pack --dry-run
+```
+
+維護者必須發布新的語意版本，`@latest` 才能提供更新：
+
+```bash
+npm version patch
+npm publish
+```
+
+`prepublishOnly` 會自動執行 npx 安裝器測試與合成技能測試。已發布過的 npm 版本不得重複使用。
 
 測試素材只能使用合成 fixture。不得提交使用者未公開的來源、個資、受版權保護的出版社模板或機密結果。
 

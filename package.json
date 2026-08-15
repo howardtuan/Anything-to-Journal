@@ -1,0 +1,52 @@
+{
+  "name": "anything-to-journal",
+  "version": "1.0.0",
+  "description": "Install and update the Anything-to-Journal Agent Skill with npx",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "anything-to-journal": "bin/anything-to-journal.mjs"
+  },
+  "files": [
+    "bin",
+    "skills/anything-to-journal",
+    "!skills/anything-to-journal/**/__pycache__",
+    "!skills/anything-to-journal/**/*.pyc",
+    "!skills/anything-to-journal/**/*.pyo",
+    "!skills/anything-to-journal/**/.DS_Store",
+    "!skills/anything-to-journal/**/.env",
+    "!skills/anything-to-journal/**/.env.*",
+    "!skills/anything-to-journal/**/.dev.vars",
+    "!skills/anything-to-journal/**/.dev.vars.*",
+    "!skills/anything-to-journal/**/*.pem"
+  ],
+  "scripts": {
+    "test": "node --test tests/installer.test.mjs",
+    "test:skill": "python3 -m unittest discover -s tests -v",
+    "check": "npm run test && npm run test:skill",
+    "pack:inspect": "npm pack --dry-run",
+    "prepublishOnly": "npm run check"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/howardtuan/Anything-to-Journal.git"
+  },
+  "homepage": "https://anything-to-journal-website.howardtuan.workers.dev/",
+  "bugs": {
+    "url": "https://github.com/howardtuan/Anything-to-Journal/issues"
+  },
+  "keywords": [
+    "agent-skill",
+    "codex",
+    "journal",
+    "latex",
+    "overleaf",
+    "research"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
