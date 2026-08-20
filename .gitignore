@@ -8,3 +8,17 @@ build/
 *.egg-info/
 *.tgz
 test-output/
+
+# Maintainer-only npm publishing material
+/.npmrc
+/.npm/
+/.npmignore
+/.private/npm/
+/npm-release/
+/npm-publish/
+/NPM_RELEASE*
+/NPM_PUBLISH*
+/npm-release.*
+/npm-publish.*
+/release-npm.*
+/publish-npm.*

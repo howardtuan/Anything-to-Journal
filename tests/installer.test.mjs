@@ -44,7 +44,6 @@ test("package exposes one npx-compatible binary", () => {
   assert.equal(packageJson.name, "anything-to-journal");
   assert.equal(packageJson.bin["anything-to-journal"], "bin/anything-to-journal.mjs");
   assert.equal(packageJson.private, undefined);
-  assert.equal(packageJson.publishConfig.access, "public");
   assert.ok(packageJson.files.includes("!skills/anything-to-journal/**/*.pyc"));
 });
 

@@ -310,21 +310,6 @@ python3 -m unittest discover -s tests -v
 python3 /path/to/skill-creator/scripts/quick_validate.py skills/anything-to-journal
 ```
 
-發布前先檢查 npm 套件實際包含的檔案：
-
-```bash
-npm pack --dry-run
-```
-
-維護者必須發布新的語意版本，`@latest` 才能提供更新：
-
-```bash
-npm version patch
-npm publish
-```
-
-`prepublishOnly` 會自動執行 npx 安裝器測試與合成技能測試。已發布過的 npm 版本不得重複使用。
-
 測試素材只能使用合成 fixture。不得提交使用者未公開的來源、個資、受版權保護的出版社模板或機密結果。
 
 ## 授權與引用

@@ -310,21 +310,6 @@ python3 -m unittest discover -s tests -v
 python3 /path/to/skill-creator/scripts/quick_validate.py skills/anything-to-journal
 ```
 
-Inspect the exact npm package contents before releasing:
-
-```bash
-npm pack --dry-run
-```
-
-Maintainers must publish a new semantic version before `@latest` can deliver an update:
-
-```bash
-npm version patch
-npm publish
-```
-
-The `prepublishOnly` check runs both the npx installer tests and the synthetic skill suite. Never reuse an already published npm version.
-
 Fixtures must be synthetic. Never commit a user's unpublished sources, private data, copyrighted publisher template, or confidential results.
 
 ## License and citation

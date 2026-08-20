@@ -23,9 +23,7 @@
   "scripts": {
     "test": "node --test tests/installer.test.mjs",
     "test:skill": "python3 -m unittest discover -s tests -v",
-    "check": "npm run test && npm run test:skill",
-    "pack:inspect": "npm pack --dry-run",
-    "prepublishOnly": "npm run check"
+    "check": "npm run test && npm run test:skill"
   },
   "engines": {
     "node": ">=18"
@@ -45,8 +43,5 @@
     "latex",
     "overleaf",
     "research"
-  ],
-  "publishConfig": {
-    "access": "public"
-  }
+  ]
 }
