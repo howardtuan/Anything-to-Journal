@@ -1,4 +1,4 @@
 interface:
   display_name: "Anything to Journal"
-  short_description: "Turn any source folder into an editable journal manuscript"
-  default_prompt: "Use $anything-to-journal to turn this source-material folder into a journal manuscript."
+  short_description: "Build and locally edit an auditable journal manuscript"
+  default_prompt: "Use $anything-to-journal to turn this source-material folder into a journal manuscript, then open its local PDF and LaTeX Workspace."

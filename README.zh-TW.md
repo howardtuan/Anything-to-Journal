@@ -4,7 +4,7 @@
 
 <p align="center"><strong>Anything in. Journal out.</strong></p>
 
-<p align="center">把一個研究資料夾裡的任何素材，整理成來源可追蹤的 Journal 稿件、可編輯 LaTeX 專案、逐頁檢查過的 PDF，以及可直接上傳 Overleaf 的單一 ZIP。</p>
+<p align="center">把一個研究資料夾裡的任何素材，整理成來源可追蹤的 Journal 稿件、可編輯 LaTeX 專案、逐頁檢查過的 PDF、本機 PDF／LaTeX Workspace，以及可直接上傳 Overleaf 的單一 ZIP。</p>
 
 <p align="center"><a href="https://anything-to-journal-website.howardtuan.workers.dev/">官方網站</a> · <a href="README.md">English</a></p>
 
@@ -21,6 +21,7 @@ Anything to Journal 是一套開源 Agent Skill。你只要把一篇稿件的所
 - 素材清冊、逐檔審閱記錄、來源追蹤表與數值證據對照表；
 - 保留來源的圖、表、公式、引用與支援檔案；
 - 作者決策與品質閘門報告；
+- 僅在本機運作、包含可捲動 PDF 預覽與 LaTeX 編輯器的 Manuscript Workspace；
 - 可在 Overleaf 以 **New Project → Upload Project** 直接上傳的 `submission/overleaf-upload.zip`；
 - 便於重現、審閱與交接的完整封裝。
 
@@ -39,7 +40,8 @@ Anything to Journal 是一套開源 Agent Skill。你只要把一篇稿件的所
       ├─ 確認只能由作者決定的事項
       ├─ 編譯、逐頁檢查 PDF、執行稽核
       │
-      └─ journal-output/submission/overleaf-upload.zip
+      ├─ journal-output/submission/overleaf-upload.zip
+      └─ 本機 Manuscript Workspace：PDF 預覽 | LaTeX
 ```
 
 格式選擇一定發生在讀取素材內容之前。指定期刊或研討會時，需有當前官方說明或官方模板；選通用草稿時使用內建的出版社中立交換格式，結果會清楚標示為草稿。
@@ -128,6 +130,8 @@ python3 install.py
 
 你回答後，agent 才會逐檔讀取與分類、依證據起草、詢問作者專屬決策、編譯 PDF，並回傳完整輸出資料夾。
 
+如果目前環境可以持續執行 localhost 程序，agent 接著會啟動 Manuscript Workspace 並回傳 `http://127.0.0.1:PORT` 網址。在 Codex Desktop 具有內建瀏覽器能力時，可把同一個頁面開在右側；完全相同的網址也能用 Chrome、Safari 或 Edge 開啟。
+
 ## 直接建立工作區
 
 通常由 agent 代為執行。選好模式後，通用草稿可使用：
@@ -175,7 +179,8 @@ journal-output/
 │   ├── source-review.json
 │   ├── author-decisions.json
 │   ├── visual-inspection.json
-│   └── quality-report.md
+│   ├── quality-report.md
+│   └── workspace-invalidation.json  # audit 後又修改原始檔時產生
 ├── submission/
 │   ├── overleaf-upload/              # 展開後的可編輯專案
 │   ├── overleaf-upload.zip           # 只要上傳這一個檔案
@@ -185,6 +190,51 @@ journal-output/
 ```
 
 來源帳本使用穩定的 `src-material-NNNN` ID。每個素材最終都會是 `verified` 並對應到實際輸出，或是 `not-used` 並附上具體原因。稿件中的數值陳述則會有與 `evidence-map.csv` 一致的相鄰證據標記。
+
+## 在本機 Manuscript Workspace 編輯
+
+論文完成後的循環如下：
+
+```text
+Anything-to-Journal
+        ↓
+產生 LaTeX + PDF
+        ↓
+啟動 Manuscript Workspace
+        ↓
+PDF 預覽 | LaTeX
+        ↓
+Codex 修改 或 手動修改
+        ↓
+儲存並重新編譯 PDF 預覽
+        ↓
+正式 build + 逐頁檢查 + audit
+```
+
+可直接用以下指令啟動：
+
+```bash
+python3 skills/anything-to-journal/scripts/workspace_editor.py \
+  /absolute/path/journal-output
+```
+
+指令會印出像 `http://127.0.0.1:43127` 的網址，並持續執行直到你停止。預設 `--port 0` 會自動選擇可用連接埠；加上 `--open-browser` 則會請作業系統以預設瀏覽器開啟同一網址。
+
+這套功能只有一份 Web UI，也只修改一組實際原始檔：
+
+- **PDF 預覽**是預設分頁。嵌入式 PDF viewer 可直接捲動閱讀完整論文；每次預覽編譯成功會自動更新，編譯失敗則保留上一版成功的 PDF。
+- **LaTeX** 直接編輯實際的 `journal-output/manuscript/manuscript.tex`。檔案選單也會找出其他同層 `.tex` 與 `.bib` 原始檔。輕量編輯器包含 LaTeX／BibTeX highlighting、行號、搜尋、Undo／Redo 與 Ctrl/Cmd+S。
+- 儲存時會以原子操作寫入實際檔案、顯示 Saved／Unsaved／Compiling／Compile Failed，經短暫 debounce 後再編譯；也可隨時按 **Recompile**。
+- 若 Codex 從聊天室修改原始檔，執行中的 Workspace 會偵測、在沒有未儲存內容時更新 Editor、重新編譯並刷新 PDF。如果瀏覽器內還有未儲存文字，畫面會顯示外部修改衝突，拒絕用舊版本覆寫磁碟內容。
+
+Workspace 是預覽與編輯層，不會取代正式品質閘門。任何手動或 Codex 修改都會撤銷舊的 `submission_ready`、視覺檢查、作者最終核准雜湊、已升級的投稿 PDF 與完整封裝狀態。完成最後修改後，仍要重新執行既有正式流程：
+
+```bash
+python3 skills/anything-to-journal/scripts/build.py /absolute/path/journal-output
+python3 skills/anything-to-journal/scripts/audit.py /absolute/path/journal-output --require-pdf
+```
+
+伺服器只綁定 `127.0.0.1`，會拒絕 path traversal、原始檔 symlink、跨來源寫入及讀取專案外檔案；不使用外部 CDN、不上傳論文，預覽編譯也不啟用 LaTeX shell escape。Codex Desktop 與一般瀏覽器只是顯示同一個 localhost 頁面，不依賴另一套 Desktop UI 或不存在的私有 Codex API。CLI 或 headless 環境可略過這個額外 UI，原本的 build、audit、封裝與 Overleaf 流程仍完整可用。
 
 ## 在 Overleaf 編輯
 
@@ -240,6 +290,7 @@ python3 skills/anything-to-journal/scripts/preflight.py source-document.docx --s
 - npx 安裝器需要 Node.js 18 以上版本；
 - Python 3.10 以上；
 - TeX 引擎：優先 Tectonic，也支援 XeLaTeX 或 LuaLaTeX；
+- 選用本機 Manuscript Workspace 時需要目前版本的瀏覽器；
 - 選用 Pandoc 進行豐富的 DOCX 語意轉換；
 - 選用 LibreOffice／Word、Poppler 與影像工具進行高保真渲染與檢查。
 

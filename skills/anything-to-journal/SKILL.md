@@ -1,6 +1,6 @@
 ---
 name: anything-to-journal
-description: Turn a fresh folder of source materials—documents, PDFs, notes, data, figures, tables, references, and journal templates—into an English journal or conference manuscript in editable LaTeX. Use when Codex must create a journal article from mixed research materials, ask the user to choose a generic draft or a specific venue template before reading the sources, preserve evidence and citations, build and inspect the PDF, or return a complete Overleaf-ready upload bundle.
+description: Turn a fresh folder of source materials—documents, PDFs, notes, data, figures, tables, references, and journal templates—into an English journal or conference manuscript in editable LaTeX. Use when Codex must create a journal article from mixed research materials, ask the user to choose a generic draft or a specific venue template before reading the sources, preserve evidence and citations, build and inspect the PDF, return a complete Overleaf-ready upload bundle, or open the finished manuscript in the local PDF Preview and LaTeX Workspace.
 ---
 
 # Anything to Journal
@@ -21,6 +21,7 @@ Do not call the result complete unless all applicable items are true:
 8. Compile the PDF, inspect every rendered page, and leave no unresolved placeholder, citation, reference, or unsupported quantitative claim.
 9. Return `submission/overleaf-upload.zip` and `submission/overleaf-upload/` with `main.tex` at the root, plus the complete audit package.
 10. Never submit externally. The human authors make the final decisions and submission.
+11. After the deliverables exist, start the local Manuscript Workspace when the current environment can keep a localhost process alive. Return its exact URL whether or not an in-app browser is available.
 
 ## Confirm the mode before reading source content
 
@@ -133,6 +134,41 @@ Render and inspect every page of every generated PDF. Record the current hashes,
 
 Read [quality-gates.md](references/quality-gates.md) for acceptance criteria. A generic run remains a draft even when all checks pass. A named target can become ready for author review only after venue evidence, source review, traceability, author decisions, build hashes, and rendered-page review all agree.
 
+### 7. Open the local Manuscript Workspace
+
+After the LaTeX, PDF, references, reports, audit evidence, and submission files exist, start the same local editing surface for both Codex Desktop and ordinary browsers:
+
+```bash
+python3 <skill-dir>/scripts/workspace_editor.py /absolute/path/fresh-folder/journal-output
+```
+
+Keep the process alive and capture the printed `http://127.0.0.1:PORT` URL. The server binds only to `127.0.0.1`; it does not upload the manuscript or use a CDN. `--port 0` is the default and chooses a free port. Use `--open-browser` only when the user wants the operating system's default browser opened as well.
+
+The Workspace defaults to **PDF Preview** and offers a **LaTeX** tab. The editor reads and writes the real files in `journal-output/manuscript/`, especially `manuscript.tex`, and discovers the other flat `.tex` and `.bib` files. It does not make an editor-only copy. Saving uses a short debounce and a shell-escape-disabled preview compile; a successful compile atomically replaces the preview, while a failed compile keeps the last successful PDF.
+
+When changing the manuscript in chat, edit `journal-output/manuscript/manuscript.tex` or the applicable supporting `.tex`/`.bib` file—not `submission/overleaf-upload/`. The running Workspace detects that external edit, reloads it when the browser has no unsaved content, and recompiles the PDF. If the browser has unsaved content, the editor must show the external-modification conflict and refuse a stale save instead of overwriting either version.
+
+Any editor or chat change invalidates prior audit/final-ready state. Workspace preview compilation is intentionally separate from the formal pipeline. When the user finishes editing, rerun `build.py`, inspect the new PDF pages, update visual-inspection evidence, and rerun `audit.py --require-pdf` before calling the revised manuscript complete.
+
+If a Codex Desktop in-app browser capability is actually available, open the exact printed localhost URL there so the user sees the Workspace at the side. Do not claim an unavailable Codex API or claim the page was opened without verifying it. If it cannot be opened automatically, keep the Workspace running, return the URL, and tell the user that the same URL works in Chrome, Safari, Edge, or a Codex Desktop browser pane that accepts localhost URLs. A headless or CLI-only environment must still complete the original manuscript, build, audit, and Overleaf handoff normally.
+
+Use this handoff wording, adapted to the actual environment and verified actions:
+
+```text
+The manuscript is complete.
+
+You can now make final edits:
+1. [Only if verified] The manuscript Workspace is open in the Codex Desktop side browser.
+   - PDF Preview
+   - LaTeX editing
+2. Open the same Workspace in any browser:
+   http://127.0.0.1:PORT
+
+You can edit LaTeX directly or continue asking me for changes in chat.
+Both edit the same manuscript files and regenerate the PDF preview.
+Run the formal build and audit again after final edits.
+```
+
 ## Hand off Overleaf without file picking
 
 Tell the user to upload exactly:
@@ -157,5 +193,7 @@ Identify at least:
 - `source/source-manifest.json` and `source/inventory.md`;
 - `manuscript/traceability.csv` and `manuscript/evidence-map.csv`;
 - `reports/source-review.json`, `format-decision.json`, `author-decisions.json`, and `quality-report.md`.
+
+When the Manuscript Workspace is running, also return its exact localhost URL and state whether opening it in Codex Desktop was verified, unavailable, or not attempted. Mention that `reports/workspace-invalidation.json` records post-audit edits when it exists.
 
 State the chosen mode, which source IDs remain unresolved, which PDFs were inspected, and the exact next human decisions. Never call a generic draft submission-ready and never claim acceptance or venue approval.

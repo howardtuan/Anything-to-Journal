@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manuscript Workspace</title>
+  <link rel="stylesheet" href="/assets/workspace.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-block">
+      <div class="brand-mark" aria-hidden="true">A<span>J</span></div>
+      <div>
+        <h1>Manuscript Workspace</h1>
+        <p id="workspaceSubtitle">Local-only editing · journal-output</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span id="saveStatus" class="status saved" role="status" aria-live="polite">Saved</span>
+      <button id="recompileButton" class="button primary" type="button">Recompile</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Manuscript workspace views">
+    <button id="pdfTab" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="pdfPanel">
+      PDF Preview
+    </button>
+    <button id="latexTab" class="tab" type="button" role="tab" aria-selected="false" aria-controls="latexPanel">
+      LaTeX
+    </button>
+  </nav>
+
+  <main class="workspace-shell">
+    <section id="pdfPanel" class="panel pdf-panel active" role="tabpanel" aria-labelledby="pdfTab">
+      <div id="pdfEmpty" class="empty-state hidden">
+        <div class="empty-icon" aria-hidden="true">PDF</div>
+        <h2>Preparing preview</h2>
+        <p>The last successful PDF will appear here. A failed compile will not remove it.</p>
+      </div>
+      <iframe id="pdfFrame" title="Scrollable manuscript PDF preview"></iframe>
+    </section>
+
+    <section id="latexPanel" class="panel editor-panel" role="tabpanel" aria-labelledby="latexTab" hidden>
+      <div class="editor-toolbar">
+        <label class="file-picker-label" for="filePicker">File</label>
+        <select id="filePicker" aria-label="Editable LaTeX or bibliography file"></select>
+        <div class="toolbar-spacer"></div>
+        <button id="searchButton" class="button subtle" type="button" title="Search (Ctrl/Cmd+F)">Search</button>
+        <button id="undoButton" class="button icon" type="button" title="Undo (Ctrl/Cmd+Z)" aria-label="Undo">↶</button>
+        <button id="redoButton" class="button icon" type="button" title="Redo (Ctrl/Cmd+Shift+Z)" aria-label="Redo">↷</button>
+        <button id="saveButton" class="button primary" type="button" title="Save (Ctrl/Cmd+S)">Save</button>
+      </div>
+
+      <div id="searchBar" class="search-bar hidden" role="search">
+        <label for="searchInput">Find</label>
+        <input id="searchInput" type="search" autocomplete="off" spellcheck="false">
+        <span id="searchCount" aria-live="polite">0 / 0</span>
+        <button id="searchPrevious" class="button icon" type="button" aria-label="Previous match">↑</button>
+        <button id="searchNext" class="button icon" type="button" aria-label="Next match">↓</button>
+        <button id="searchClose" class="button icon" type="button" aria-label="Close search">×</button>
+      </div>
+
+      <div id="conflictBanner" class="conflict-banner hidden" role="alert">
+        <div>
+          <strong>External modification detected</strong>
+          <p>This file changed on disk while you have unsaved edits. Nothing was overwritten. Copy any text you need, then reload the current file.</p>
+        </div>
+        <div class="conflict-actions">
+          <button id="keepUnsavedButton" class="button subtle" type="button">Keep unsaved text</button>
+          <button id="reloadExternalButton" class="button danger" type="button">Reload disk version</button>
+        </div>
+      </div>
+
+      <div class="code-editor" id="codeEditor">
+        <pre id="lineNumbers" class="line-numbers" aria-hidden="true">1</pre>
+        <div class="code-stage">
+          <pre id="highlightLayer" class="highlight-layer" aria-hidden="true"></pre>
+          <textarea id="sourceEditor" aria-label="LaTeX source editor" autocomplete="off" autocapitalize="off" spellcheck="false" wrap="off"></textarea>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside id="compileFailure" class="compile-failure hidden" role="alert">
+    <div>
+      <strong>Compile Failed</strong>
+      <p>The previous successful PDF is still available.</p>
+    </div>
+    <button id="compileDetailsButton" class="button subtle" type="button">Show log</button>
+    <pre id="compileLog" class="hidden"></pre>
+  </aside>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <script src="/assets/workspace.js"></script>
+</body>
+</html>

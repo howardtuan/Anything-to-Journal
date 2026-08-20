@@ -1,7 +1,7 @@
 {
   "name": "anything-to-journal",
-  "version": "1.0.0",
-  "description": "Install and update the Anything-to-Journal Agent Skill with npx",
+  "version": "1.1.0",
+  "description": "Build auditable journal manuscripts and edit them in a local PDF/LaTeX workspace",
   "license": "MIT",
   "type": "module",
   "bin": {

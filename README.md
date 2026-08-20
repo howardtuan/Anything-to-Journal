@@ -4,7 +4,7 @@
 
 <p align="center"><strong>Anything in. Journal out.</strong></p>
 
-<p align="center">Turn anything in one research folder into an evidence-traceable journal manuscript, editable LaTeX project, inspected PDF, and one-file Overleaf upload.</p>
+<p align="center">Turn anything in one research folder into an evidence-traceable journal manuscript, editable LaTeX project, inspected PDF, local PDF/LaTeX Workspace, and one-file Overleaf upload.</p>
 
 <p align="center"><a href="https://anything-to-journal-website.howardtuan.workers.dev/">Website</a> · <a href="README.zh-TW.md">繁體中文</a></p>
 
@@ -21,6 +21,7 @@ The workflow accepts mixed inputs: PDFs, Word files, notes, Markdown, LaTeX, spr
 - a source manifest, material review record, traceability ledger, and quantitative evidence map;
 - preserved figures, tables, equations, citations, and supporting files;
 - author-decision and quality-gate reports;
+- a local-only Manuscript Workspace with a scrollable PDF preview and syntax-highlighted LaTeX editor;
 - `submission/overleaf-upload.zip`, ready for **New Project → Upload Project** in Overleaf;
 - a complete audit package for reproducibility and handoff.
 
@@ -39,7 +40,8 @@ fresh material folder
         ├─ confirm author-only decisions
         ├─ compile, inspect every PDF page, and audit
         │
-        └─ journal-output/submission/overleaf-upload.zip
+        ├─ journal-output/submission/overleaf-upload.zip
+        └─ local Manuscript Workspace: PDF Preview | LaTeX
 ```
 
 The format choice is deliberately made before source content is opened. A named journal or conference requires its current official instructions or template. A generic run uses the bundled publisher-neutral interchange profile and remains clearly labeled as a draft.
@@ -128,6 +130,8 @@ Before reading the materials, the agent asks you to choose:
 
 After that answer, the agent reads and classifies every file, drafts from the evidence, asks for human-only declarations and approvals, builds the PDFs, and returns the output folder.
 
+When the environment can keep a localhost process running, the agent then starts the Manuscript Workspace and returns its `http://127.0.0.1:PORT` URL. In Codex Desktop it can open that exact page in the side browser when the browser capability is available; the same URL also opens in Chrome, Safari, or Edge.
+
 ## Direct workspace preparation
 
 Agents normally run this for you. After the format decision, a generic intake is:
@@ -175,7 +179,8 @@ journal-output/
 │   ├── source-review.json
 │   ├── author-decisions.json
 │   ├── visual-inspection.json
-│   └── quality-report.md
+│   ├── quality-report.md
+│   └── workspace-invalidation.json  # appears after post-audit source edits
 ├── submission/
 │   ├── overleaf-upload/              # expanded editable project
 │   ├── overleaf-upload.zip           # upload this one file
@@ -185,6 +190,51 @@ journal-output/
 ```
 
 The source ledger uses stable `src-material-NNNN` IDs. Every material ends as `verified` with a real output mapping or `not-used` with a concrete reason. Quantitative manuscript claims carry adjacent evidence markers matching `evidence-map.csv`.
+
+## Edit in the local Manuscript Workspace
+
+The finished-paper loop is:
+
+```text
+Anything-to-Journal
+        ↓
+generated LaTeX + PDF
+        ↓
+start Manuscript Workspace
+        ↓
+PDF Preview | LaTeX
+        ↓
+Codex edit or manual edit
+        ↓
+save and recompile the PDF preview
+        ↓
+formal build + page inspection + audit
+```
+
+Start it directly with:
+
+```bash
+python3 skills/anything-to-journal/scripts/workspace_editor.py \
+  /absolute/path/journal-output
+```
+
+The command prints a URL such as `http://127.0.0.1:43127` and stays running until stopped. `--port 0` is the default and chooses a free port. Add `--open-browser` to ask the operating system to open the same URL in its default browser.
+
+There is only one web UI and one set of source files:
+
+- **PDF Preview** is the default tab. Its embedded PDF viewer scrolls through the complete paper, updates after every successful preview compile, and retains the previous successful PDF when compilation fails.
+- **LaTeX** edits the actual `journal-output/manuscript/manuscript.tex`. A file picker also discovers the other flat `.tex` and `.bib` sources. The lightweight editor includes LaTeX/BibTeX highlighting, line numbers, search, undo/redo, and Ctrl/Cmd+S.
+- Saving writes the actual source atomically, shows Saved/Unsaved/Compiling/Compile Failed state, then compiles after a short debounce. The **Recompile** button runs the same preview compile on demand.
+- If Codex changes a source file from chat, the running Workspace detects it, refreshes a clean editor, recompiles, and updates the preview. If the browser contains unsaved text, it shows an external-change conflict and refuses to overwrite the disk version.
+
+The Workspace is a preview and editing layer, not a replacement for the quality gates. Any manual or Codex source edit revokes the previous `submission_ready` state, visual inspection, author approval hashes, promoted submission PDF, and complete-package status. After final edits, run the existing formal commands again:
+
+```bash
+python3 skills/anything-to-journal/scripts/build.py /absolute/path/journal-output
+python3 skills/anything-to-journal/scripts/audit.py /absolute/path/journal-output --require-pdf
+```
+
+The server binds to `127.0.0.1` only. It rejects path traversal, source symlinks, cross-origin writes, and files outside the prepared project; it uses no external CDN or manuscript upload, and preview compilation uses no LaTeX shell escape. Codex Desktop and an ordinary browser simply display the same localhost page—there is no separate Desktop UI or private Codex API dependency. CLI and headless environments can skip this optional UI while retaining the complete original build, audit, package, and Overleaf workflow.
 
 ## Edit in Overleaf
 
@@ -240,6 +290,7 @@ Unless a confirmed official template imposes a stricter compatible rule, the wor
 - Node.js 18 or newer for the npx installer;
 - Python 3.10 or newer;
 - a TeX engine: Tectonic is preferred, with XeLaTeX or LuaLaTeX supported;
+- a current browser for the optional local Manuscript Workspace;
 - optional Pandoc for rich DOCX semantic conversion;
 - optional LibreOffice/Word, Poppler, and image tools for high-fidelity rendering and inspection.
 
