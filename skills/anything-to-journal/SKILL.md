@@ -107,6 +107,8 @@ The observed response increased by 12.4\%.
 
 Read [writing-and-integrity.md](references/writing-and-integrity.md) before drafting.
 
+Read [evidence-preview.md](references/evidence-preview.md) when recording claim locations. Populate `manuscript/evidence-locations.json` with rendered manuscript phrases and exact source quotations, pages, lines, or figure/table regions for important terms, values, and visuals. Reuse the evidence-map claim/source IDs; never infer a precise source location from a translated claim alone.
+
 ### 4. Draft the editable manuscript
 
 Edit `manuscript/manuscript.tex`, `references.bib`, and any supporting `.tex` files. Keep source files immutable. Use concise academic English, consistent terminology, conservative claim strength, and venue-compliant sectioning.
@@ -145,6 +147,8 @@ python3 <skill-dir>/scripts/workspace_editor.py /absolute/path/fresh-folder/jour
 Keep the process alive and capture the printed `http://127.0.0.1:PORT` URL. The server binds only to `127.0.0.1`; it does not upload the manuscript or use a CDN. `--port 0` is the default and chooses a free port. Use `--open-browser` only when the user wants the operating system's default browser opened as well.
 
 The Workspace defaults to **PDF Preview** and offers a **LaTeX** tab. The editor reads and writes the real files in `journal-output/manuscript/`, especially `manuscript.tex`, and discovers the other flat `.tex` and `.bib` files. It does not make an editor-only copy. Saving uses a short debounce and a shell-escape-disabled preview compile; a successful compile atomically replaces the preview, while a failed compile keeps the last successful PDF.
+
+In PDF Preview, click reference nodes beside mapped terms, numbers, and figure/table captions to open the supporting file. Check its file name, page or lines, and yellow highlight against the evidence. Multiple sources remain separately selectable. Missing or ambiguous locators are shown explicitly; older projects can still show file-level references without exact highlights. Check these links after the final compile.
 
 When changing the manuscript in chat, edit `journal-output/manuscript/manuscript.tex` or the applicable supporting `.tex`/`.bib` file—not `submission/overleaf-upload/`. The running Workspace detects that external edit, reloads it when the browser has no unsaved content, and recompiles the PDF. If the browser has unsaved content, the editor must show the external-modification conflict and refuse a stale save instead of overwriting either version.
 
@@ -192,6 +196,7 @@ Identify at least:
 - `manuscript/manuscript.tex` and `manuscript/references.bib`;
 - `source/source-manifest.json` and `source/inventory.md`;
 - `manuscript/traceability.csv` and `manuscript/evidence-map.csv`;
+- `manuscript/evidence-locations.json` — PDF reference positions and exact source locators;
 - `reports/source-review.json`, `format-decision.json`, `author-decisions.json`, and `quality-report.md`.
 
 When the Manuscript Workspace is running, also return its exact localhost URL and state whether opening it in Codex Desktop was verified, unavailable, or not attempted. Mention that `reports/workspace-invalidation.json` records post-audit edits when it exists.

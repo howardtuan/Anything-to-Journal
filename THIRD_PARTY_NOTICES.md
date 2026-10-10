@@ -1,6 +1,6 @@
 # Third-party notices
 
-No third-party executable, publisher class, bibliography style, logo, font, or user research content is vendored in this repository.
+The local PDF Workspace bundles [PDF.js](https://github.com/mozilla/pdf.js) (`pdfjs-dist` 6.3.289, Apache-2.0) in `skills/anything-to-journal/assets/workspace/pdfjs/`, including its worker, CMaps, standard fonts, and image codecs. Its Apache license and the individual font/codec licenses are retained alongside the assets. `VERSION.json` records the upstream package integrity; maintainers can reproduce the bundle with `node scripts/vendor-pdfjs.mjs`. PDF scripting is not enabled. No publisher template or user research content is bundled.
 
 The workflow interoperates with separately installed software, including:
 

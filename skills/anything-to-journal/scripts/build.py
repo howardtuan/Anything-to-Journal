@@ -267,6 +267,7 @@ def overleaf_source_files(manuscript_sources: list[Path]) -> list[Path]:
     excluded = {
         "traceability.csv",
         "evidence-map.csv",
+        "evidence-locations.json",
         "journal-profile.json",
         "submission-checklist.md",
         "source-elements.tex",

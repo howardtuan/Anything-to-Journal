@@ -22,6 +22,7 @@ Anything to Journal 是一套開源 Agent Skill。你只要把一篇稿件的所
 - 保留來源的圖、表、公式、引用與支援檔案；
 - 作者決策與品質閘門報告；
 - 僅在本機運作、包含可捲動 PDF 預覽與 LaTeX 編輯器的 Manuscript Workspace；
+- 名詞、數值、圖表旁可點擊的參考資訊節點，開啟來源檔案並以黃色標記相關內容；
 - 可在 Overleaf 以 **New Project → Upload Project** 直接上傳的 `submission/overleaf-upload.zip`；
 - 便於重現、審閱與交接的完整封裝。
 
@@ -173,7 +174,8 @@ journal-output/
 │   ├── manuscript.tex                # 主要可編輯原始檔
 │   ├── references.bib
 │   ├── traceability.csv
-│   └── evidence-map.csv
+│   ├── evidence-map.csv
+│   └── evidence-locations.json
 ├── reports/
 │   ├── format-decision.json
 │   ├── source-review.json
@@ -220,9 +222,12 @@ python3 skills/anything-to-journal/scripts/workspace_editor.py \
 
 指令會印出像 `http://127.0.0.1:43127` 的網址，並持續執行直到你停止。預設 `--port 0` 會自動選擇可用連接埠；加上 `--open-browser` 則會請作業系統以預設瀏覽器開啟同一網址。
 
+來源位置記錄於 `manuscript/evidence-locations.json`，與既有的 `evidence-map.csv` 共用主張與來源 ID；詳見[欄位格式與範例](skills/anything-to-journal/references/evidence-preview.md)。舊專案仍可查看檔案層級的來源，缺少定位或比對到多處時會明確提示。支援 PDF 文字、常見 UTF-8 文字／CSV、DOCX 抽取文字與點陣圖片區域；其他格式提供原始檔下載與已記錄的位置說明。掃描式 PDF 需記錄區域，本功能不自動執行 OCR。PDF.js 隨技能安裝，全程在本機載入。
+
 這套功能只有一份 Web UI，也只修改一組實際原始檔：
 
 - **PDF 預覽**是預設分頁。嵌入式 PDF viewer 可直接捲動閱讀完整論文；每次預覽編譯成功會自動更新，編譯失敗則保留上一版成功的 PDF。
+- **參考資訊節點**出現在已對應的文字旁。例如點擊「模型準確率 0.9」旁的節點，即可查看來源檔名、頁碼或行號，並以黃色螢光筆標記原文。圖表可標示已記錄的區域；同一項資訊有多個來源時，可逐一切換檢視。
 - **LaTeX** 直接編輯實際的 `journal-output/manuscript/manuscript.tex`。檔案選單也會找出其他同層 `.tex` 與 `.bib` 原始檔。輕量編輯器包含 LaTeX／BibTeX highlighting、行號、搜尋、Undo／Redo 與 Ctrl/Cmd+S。
 - 儲存時會以原子操作寫入實際檔案、顯示 Saved／Unsaved／Compiling／Compile Failed，經短暫 debounce 後再編譯；也可隨時按 **Recompile**。
 - 若 Codex 從聊天室修改原始檔，執行中的 Workspace 會偵測、在沒有未儲存內容時更新 Editor、重新編譯並刷新 PDF。如果瀏覽器內還有未儲存文字，畫面會顯示外部修改衝突，拒絕用舊版本覆寫磁碟內容。

@@ -198,6 +198,7 @@ function setTab(name) {
   elements.latexPanel.classList.toggle("active", !pdf);
   elements.pdfPanel.hidden = !pdf;
   elements.latexPanel.hidden = pdf;
+  if (pdf && window.WorkspaceEvidence) window.WorkspaceEvidence.refresh();
   if (!pdf) elements.sourceEditor.focus();
 }
 
@@ -321,12 +322,16 @@ async function recompile() {
   }
 }
 
-function updatePdf(pdf) {
-  elements.pdfEmpty.classList.toggle("hidden", pdf.available);
-  elements.pdfFrame.classList.toggle("hidden", !pdf.available);
+function updatePdf(pdf, serverState) {
+  if (window.WorkspaceEvidence) {
+    window.WorkspaceEvidence.update(serverState);
+  } else {
+    elements.pdfEmpty.classList.toggle("hidden", pdf.available);
+    elements.pdfFrame.classList.toggle("hidden", !pdf.available);
+  }
   if (pdf.available && pdf.version !== editorState.pdfVersion) {
     editorState.pdfVersion = pdf.version;
-    elements.pdfFrame.src = `${pdf.url}?v=${encodeURIComponent(pdf.version)}`;
+    if (!window.WorkspaceEvidence) elements.pdfFrame.src = `${pdf.url}?v=${encodeURIComponent(pdf.version)}`;
     showToast("PDF preview updated");
   }
 }
@@ -343,7 +348,7 @@ async function pollState(initial = false) {
     const serverState = await api("/api/state");
     editorState.compileStatus = serverState.compile_status;
     updateFilePicker(serverState.files);
-    updatePdf(serverState.pdf);
+    updatePdf(serverState.pdf, serverState);
     updateCompileFailure(serverState);
 
     if (!editorState.currentPath && serverState.files.length) {

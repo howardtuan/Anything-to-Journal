@@ -457,6 +457,7 @@ def main(argv: Iterable[str] | None = None) -> int:
                 "author_decisions": "reports/author-decisions.json",
                 "format_decision": "reports/format-decision.json",
                 "evidence_map": "manuscript/evidence-map.csv",
+                "evidence_locations": "manuscript/evidence-locations.json",
                 "overleaf_upload": "submission/overleaf-upload.zip",
                 "submission_package": "submission/submission-package.zip",
                 "submission_ready": False,

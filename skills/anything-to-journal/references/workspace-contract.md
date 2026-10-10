@@ -30,6 +30,7 @@ journal-output/
 │   ├── references.bib
 │   ├── traceability.csv
 │   ├── evidence-map.csv
+│   ├── evidence-locations.json     # PDF nodes and source page/text/region locators
 │   └── journal-profile.json
 ├── reports/
 │   ├── format-decision.json
@@ -57,6 +58,8 @@ Every material must have exactly one `traceability.csv` row:
 - no other terminal status is valid for a workspace material.
 
 When a source material becomes a figure, table, or equation, use `source-figure`, `source-table`, or `source-equation` as the operation and put the corresponding LaTeX label in `output_id`.
+
+For clickable PDF references, extend the same evidence-map claim IDs in `evidence-locations.json`. See [evidence-preview.md](evidence-preview.md) for exact quote, page, line, occurrence, and normalized region fields. Existing projects may omit this optional display metadata and retain file-level references.
 
 ## Complete source review
 

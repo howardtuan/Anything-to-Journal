@@ -17,6 +17,8 @@ jobs:
         run: python3 -m py_compile install.py skills/anything-to-journal/scripts/*.py tests/*.py
       - name: Run synthetic pipeline tests
         run: python3 -m unittest discover -s tests -v
+      - name: Test installer and evidence matching
+        run: node --test tests/*.test.mjs
       - name: Check canonical skill shape
         run: |
           test -f skills/anything-to-journal/SKILL.md

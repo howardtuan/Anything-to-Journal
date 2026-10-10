@@ -1,6 +1,6 @@
 {
   "name": "anything-to-journal",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Build auditable journal manuscripts and edit them in a local PDF/LaTeX workspace",
   "license": "MIT",
   "type": "module",
@@ -21,7 +21,7 @@
     "!skills/anything-to-journal/**/*.pem"
   ],
   "scripts": {
-    "test": "node --test tests/installer.test.mjs",
+    "test": "node --test tests/*.test.mjs",
     "test:skill": "python3 -m unittest discover -s tests -v",
     "check": "npm run test && npm run test:skill"
   },

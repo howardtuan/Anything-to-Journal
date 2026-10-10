@@ -181,6 +181,7 @@ EVIDENCE_FIELDS = [
 def write_evidence_map(path: Path) -> None:
     with path.open("w", encoding="utf-8-sig", newline="") as handle:
         csv.DictWriter(handle, fieldnames=EVIDENCE_FIELDS).writeheader()
+    write_json(path.with_name("evidence-locations.json"), {"schema_version": "1.0", "claims": []})
 
 
 def source_text(manifest: dict[str, Any]) -> str:
@@ -814,6 +815,7 @@ def main(argv: Iterable[str] | None = None) -> int:
                 "source_recovery": "reports/source-recovery.json",
                 "format_decision": "reports/format-decision.json",
                 "evidence_map": "manuscript/evidence-map.csv",
+                "evidence_locations": "manuscript/evidence-locations.json",
                 "submission_package": "submission/submission-package.zip",
                 "submission_ready": False,
             },

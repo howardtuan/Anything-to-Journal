@@ -32,12 +32,30 @@
 
   <main class="workspace-shell">
     <section id="pdfPanel" class="panel pdf-panel active" role="tabpanel" aria-labelledby="pdfTab">
-      <div id="pdfEmpty" class="empty-state hidden">
-        <div class="empty-icon" aria-hidden="true">PDF</div>
-        <h2>Preparing preview</h2>
-        <p>The last successful PDF will appear here. A failed compile will not remove it.</p>
+      <div class="preview-toolbar">
+        <span class="preview-heading">Manuscript</span>
+        <span id="pdfPageCount" class="preview-page-count"></span>
+        <div class="toolbar-spacer"></div>
+        <a id="pdfOriginal" class="button subtle hidden" target="_blank" rel="noopener">Open PDF ↗</a>
+        <button id="referenceToggle" class="button reference-toggle" type="button" aria-expanded="true" aria-controls="referenceSidebar">References <span id="referenceCount">0</span></button>
       </div>
-      <iframe id="pdfFrame" title="Scrollable manuscript PDF preview"></iframe>
+      <p id="previewNotice" class="preview-notice hidden" role="status"></p>
+      <div class="preview-body">
+        <div id="pdfScroll" class="pdf-scroll" aria-label="Manuscript PDF pages" tabindex="0">
+          <div id="pdfPages" class="pdf-pages"></div>
+          <iframe id="pdfFrame" class="hidden" title="Scrollable manuscript PDF preview"></iframe>
+          <div id="pdfEmpty" class="empty-state hidden">
+            <div class="empty-icon" aria-hidden="true">PDF</div>
+            <h2>Preparing preview</h2>
+            <p>The last successful PDF will appear here. A failed compile will not remove it.</p>
+          </div>
+        </div>
+        <aside id="referenceSidebar" class="reference-sidebar" aria-label="Manuscript references">
+          <div class="reference-heading"><h2>Trace the evidence</h2><p>Select a reference to inspect its original source.</p></div>
+          <div id="referenceList" class="reference-list"><p class="reference-empty">Loading reference information…</p></div>
+          <div id="referenceWarnings" class="reference-warnings"></div>
+        </aside>
+      </div>
     </section>
 
     <section id="latexPanel" class="panel editor-panel" role="tabpanel" aria-labelledby="latexTab" hidden>
@@ -91,6 +109,18 @@
   </aside>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <dialog id="sourceDialog" class="source-dialog" aria-labelledby="sourceDialogTitle" aria-describedby="sourceClaim">
+    <div class="source-dialog-header">
+      <div><p class="source-eyebrow">Reference information</p><h2 id="sourceDialogTitle">Original source</h2></div>
+      <button id="sourceClose" class="button icon" type="button" aria-label="Close source preview" autofocus>×</button>
+    </div>
+    <p id="sourceClaim" class="source-claim"></p>
+    <div id="sourceChoices" class="source-choices" role="group" aria-label="Choose a source"></div>
+    <div class="source-location-bar"><span id="sourceLocation"></span><a id="sourceOriginal" class="button subtle hidden" target="_blank" rel="noopener">Open original ↗</a></div>
+    <p id="sourceNotice" class="source-notice" role="status" aria-live="polite"></p>
+    <div id="sourceViewer" class="source-viewer" tabindex="0" aria-label="Original source preview"></div>
+  </dialog>
+  <script src="/assets/evidence.js"></script>
   <script src="/assets/workspace.js"></script>
 </body>
 </html>

@@ -53,10 +53,13 @@ test("installs a standalone skill without overwriting it", () => {
     const skills = join(root, "skills");
     const output = run(["install", "--destination", skills]);
     const target = join(skills, "anything-to-journal");
-    assert.match(output, /Installed Anything-to-Journal 1[.]1[.]0/);
+    assert.match(output, /Installed Anything-to-Journal 1[.]2[.]0/);
     assert.match(readFileSync(join(target, "SKILL.md"), "utf8"), /^name: anything-to-journal$/m);
     assert.equal(existsSync(join(target, "scripts", "workspace_editor.py")), true);
     assert.equal(existsSync(join(target, "assets", "workspace", "workspace.js")), true);
+    assert.equal(existsSync(join(target, "assets", "workspace", "evidence.js")), true);
+    assert.equal(existsSync(join(target, "assets", "workspace", "pdfjs", "pdf.worker.mjs")), true);
+    assert.equal(existsSync(join(target, "assets", "workspace", "pdfjs", "LICENSE")), true);
 
     const repeated = runFailure(["install", "--destination", skills]);
     assert.equal(repeated.status, 2);
@@ -76,7 +79,7 @@ test("updates only a verified installation and removes stale files", () => {
     writeFileSync(join(target, "stale-file.txt"), "remove during update\n");
 
     const output = run(["update", "--destination", skills]);
-    assert.match(output, /Updated Anything-to-Journal 1[.]1[.]0/);
+    assert.match(output, /Updated Anything-to-Journal 1[.]2[.]0/);
     assert.equal(existsSync(join(target, "stale-file.txt")), false);
     assert.match(readFileSync(join(target, "SKILL.md"), "utf8"), /^name: anything-to-journal$/m);
   } finally {
@@ -150,5 +153,5 @@ test("supports Codex, repository, and dry-run destinations", () => {
 
 test("reports help and package version", () => {
   assert.match(run(["--help"]), /npx anything-to-journal@latest update/);
-  assert.equal(run(["--version"]).trim(), "1.1.0");
+  assert.equal(run(["--version"]).trim(), "1.2.0");
 });

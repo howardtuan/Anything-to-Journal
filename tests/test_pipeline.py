@@ -1576,6 +1576,7 @@ Evidence \citep{{chen2020}}.
                 self.assertNotIn("manuscript.tex", overleaf_names)
                 self.assertNotIn("traceability.csv", overleaf_names)
                 self.assertNotIn("evidence-map.csv", overleaf_names)
+                self.assertNotIn("evidence-locations.json", overleaf_names)
                 self.assertNotIn("journal-profile.json", overleaf_names)
                 self.assertNotIn("submission-checklist.md", overleaf_names)
                 self.assertNotIn("source-elements.tex", overleaf_names)

@@ -22,6 +22,7 @@ The workflow accepts mixed inputs: PDFs, Word files, notes, Markdown, LaTeX, spr
 - preserved figures, tables, equations, citations, and supporting files;
 - author-decision and quality-gate reports;
 - a local-only Manuscript Workspace with a scrollable PDF preview and syntax-highlighted LaTeX editor;
+- clickable PDF references for mapped terms, values, figures, and tables, with source-file previews and yellow highlights;
 - `submission/overleaf-upload.zip`, ready for **New Project → Upload Project** in Overleaf;
 - a complete audit package for reproducibility and handoff.
 
@@ -132,6 +133,8 @@ After that answer, the agent reads and classifies every file, drafts from the ev
 
 When the environment can keep a localhost process running, the agent then starts the Manuscript Workspace and returns its `http://127.0.0.1:PORT` URL. In Codex Desktop it can open that exact page in the side browser when the browser capability is available; the same URL also opens in Chrome, Safari, or Edge.
 
+Source locations are recorded in `manuscript/evidence-locations.json`, extending the existing `evidence-map.csv`. See the [location format and examples](skills/anything-to-journal/references/evidence-preview.md). Older projects retain file-level references; missing or ambiguous locations are shown explicitly. PDF text, common UTF-8 text/CSV, DOCX extracted text, and raster image regions are supported; other formats retain an original-file download and their recorded locator. Scanned PDFs need a recorded region; there is no automatic OCR. PDF.js is bundled locally with the skill.
+
 ## Direct workspace preparation
 
 Agents normally run this for you. After the format decision, a generic intake is:
@@ -173,7 +176,8 @@ journal-output/
 │   ├── manuscript.tex                # main editable source
 │   ├── references.bib
 │   ├── traceability.csv
-│   └── evidence-map.csv
+│   ├── evidence-map.csv
+│   └── evidence-locations.json
 ├── reports/
 │   ├── format-decision.json
 │   ├── source-review.json
@@ -223,6 +227,7 @@ The command prints a URL such as `http://127.0.0.1:43127` and stays running unti
 There is only one web UI and one set of source files:
 
 - **PDF Preview** is the default tab. Its embedded PDF viewer scrolls through the complete paper, updates after every successful preview compile, and retains the previous successful PDF when compilation fails.
+- **Source references** place clickable nodes beside mapped PDF text. For example, click the reference beside “Model accuracy was 0.9.” to see the supporting file, its page or lines, and the exact source quote highlighted in yellow. Figure/table regions can be outlined, and claims with multiple sources let you inspect each file.
 - **LaTeX** edits the actual `journal-output/manuscript/manuscript.tex`. A file picker also discovers the other flat `.tex` and `.bib` sources. The lightweight editor includes LaTeX/BibTeX highlighting, line numbers, search, undo/redo, and Ctrl/Cmd+S.
 - Saving writes the actual source atomically, shows Saved/Unsaved/Compiling/Compile Failed state, then compiles after a short debounce. The **Recompile** button runs the same preview compile on demand.
 - If Codex changes a source file from chat, the running Workspace detects it, refreshes a clean editor, recompiles, and updates the preview. If the browser contains unsaved text, it shows an external-change conflict and refuses to overwrite the disk version.

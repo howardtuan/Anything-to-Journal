@@ -21,6 +21,7 @@ from typing import Any, Iterable
 from urllib.parse import parse_qs, urlparse
 
 from build import compile_tex, select_compiler
+from workspace_evidence import EvidenceCatalog, EvidenceError, content_disposition, safe_path
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -38,6 +39,7 @@ STATIC_FILES = {
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/assets/workspace.css": ("workspace.css", "text/css; charset=utf-8"),
     "/assets/workspace.js": ("workspace.js", "text/javascript; charset=utf-8"),
+    "/assets/evidence.js": ("evidence.js", "text/javascript; charset=utf-8"),
 }
 
 
@@ -130,6 +132,7 @@ class ManuscriptWorkspace:
         self.manuscript_dir = project / "manuscript"
         self.reports_dir = project / "reports"
         self.submission_dir = project / "submission"
+        self.evidence = EvidenceCatalog(project)
         self.cache_dir = project / ".manuscript-workspace"
         if self.cache_dir.is_symlink() or (self.cache_dir.exists() and not self.cache_dir.is_dir()):
             raise WorkspaceError("unsafe .manuscript-workspace cache path")
@@ -510,7 +513,10 @@ class ManuscriptWorkspace:
 
     def state(self) -> dict[str, Any]:
         files = self.list_files()
+        evidence_revision = self.evidence.evidence()["revision"]
         with self.lock:
+            pdf_available = bool(self.pdf_version and valid_pdf(self.preview_pdf))
+            pdf_current = pdf_available and self.preview_source_fingerprint == self._source_fingerprint
             return {
                 "files": files,
                 "main_file": "manuscript.tex",
@@ -518,10 +524,13 @@ class ManuscriptWorkspace:
                 "compile_error": self.compile_error,
                 "compiled_at": self.compiled_at,
                 "pdf": {
-                    "available": bool(self.pdf_version and valid_pdf(self.preview_pdf)),
+                    "available": pdf_available,
                     "version": self.pdf_version,
                     "url": "/api/pdf" if self.pdf_version else None,
+                    "current": pdf_current,
+                    "stale": pdf_available and not pdf_current,
                 },
+                "evidence_revision": evidence_revision,
                 "external_revision": self.external_revision,
                 "last_changed_paths": list(self.last_changed_paths),
                 "formal_outputs_invalidated": self.invalidated,
@@ -576,8 +585,9 @@ class WorkspaceRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header(
             "Content-Security-Policy",
-            "default-src 'self'; script-src 'self'; style-src 'self'; "
-            "img-src 'self'; connect-src 'self'; frame-src 'self'; object-src 'self'; "
+            "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; "
+            "img-src 'self' data: blob:; font-src 'self' blob:; worker-src 'self' blob:; "
+            "connect-src 'self'; frame-src 'self'; object-src 'self'; "
             "base-uri 'none'; form-action 'none'; frame-ancestors 'self'",
         )
 
@@ -629,6 +639,31 @@ class WorkspaceRequestHandler(BaseHTTPRequestHandler):
 
     def _serve_static(self, path: str, head_only: bool = False) -> bool:
         record = STATIC_FILES.get(path)
+        if not record and path.startswith("/assets/pdfjs/"):
+            relative = path.removeprefix("/assets/")
+            parts = relative.split("/")
+            allowed_suffixes = {
+                "cmaps": {".bcmap"}, "standard_fonts": {".pfb", ".ttf"},
+                "wasm": {".wasm", ".js"}, "iccs": {".icc"},
+            }
+            allowed = relative in {"pdfjs/pdf.mjs", "pdfjs/pdf.worker.mjs"} or (
+                len(parts) == 3 and parts[1] in allowed_suffixes
+                and Path(parts[2]).suffix in allowed_suffixes[parts[1]]
+            )
+            if not allowed:
+                self._error(HTTPStatus.NOT_FOUND, "workspace asset not found")
+                return True
+            try:
+                target = safe_path(STATIC_DIR, relative)
+                content_type = {
+                    ".mjs": "text/javascript; charset=utf-8",
+                    ".js": "text/javascript; charset=utf-8",
+                    ".wasm": "application/wasm", ".ttf": "font/ttf",
+                }.get(target.suffix, "application/octet-stream")
+                self._send_bytes(HTTPStatus.OK, target.read_bytes(), content_type, head_only=head_only)
+            except (EvidenceError, OSError):
+                self._error(HTTPStatus.NOT_FOUND, "workspace asset is missing or unsafe")
+            return True
         if not record:
             return False
         filename, content_type = record
@@ -638,6 +673,33 @@ class WorkspaceRequestHandler(BaseHTTPRequestHandler):
             return True
         self._send_bytes(HTTPStatus.OK, target.read_bytes(), content_type, head_only=head_only)
         return True
+
+    def _serve_source(self, source_id: str, head_only: bool = False) -> None:
+        record, content, kind, content_type = self.server.workspace.evidence.source_bytes(source_id)
+        headers = {
+            "Content-Disposition": content_disposition(record["name"], kind in {"pdf", "image"}),
+            "Accept-Ranges": "bytes",
+        }
+        status = HTTPStatus.OK
+        range_header = self.headers.get("Range")
+        if range_header:
+            size = len(content)
+            match = re.fullmatch(r"bytes=(\d*)-(\d*)", range_header.strip())
+            if not match or not any(match.groups()):
+                self._send_bytes(HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE, b"", content_type, {"Content-Range": f"bytes */{size}"}, head_only)
+                return
+            if match.group(1):
+                start = int(match.group(1))
+                end = min(int(match.group(2)), size - 1) if match.group(2) else size - 1
+            else:
+                start, end = max(0, size - int(match.group(2))), size - 1
+            if start > end or start >= size:
+                self._send_bytes(HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE, b"", content_type, {"Content-Range": f"bytes */{size}"}, head_only)
+                return
+            headers["Content-Range"] = f"bytes {start}-{end}/{size}"
+            content = content[start:end + 1]
+            status = HTTPStatus.PARTIAL_CONTENT
+        self._send_bytes(status, content, content_type, headers, head_only)
 
     def _serve_pdf(self, head_only: bool = False) -> None:
         path = self.server.workspace.preview_pdf
@@ -707,6 +769,15 @@ class WorkspaceRequestHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/pdf":
             self._serve_pdf(head_only=True)
             return
+        if parsed.path == "/api/source":
+            try:
+                values = parse_qs(parsed.query, strict_parsing=True)
+                self._serve_source(values.get("id", [""])[0], head_only=True)
+            except (EvidenceError, OSError) as exc:
+                self._error(HTTPStatus.NOT_FOUND, str(exc))
+            except ValueError:
+                self._error(HTTPStatus.BAD_REQUEST, "invalid query string")
+            return
         self._error(HTTPStatus.NOT_FOUND, "not found")
 
     def do_GET(self) -> None:
@@ -719,6 +790,17 @@ class WorkspaceRequestHandler(BaseHTTPRequestHandler):
         try:
             if parsed.path == "/api/state":
                 self._send_json(HTTPStatus.OK, self.server.workspace.state())
+                return
+            if parsed.path == "/api/evidence":
+                self._send_json(HTTPStatus.OK, self.server.workspace.evidence.evidence())
+                return
+            if parsed.path in {"/api/source", "/api/source-preview"}:
+                values = parse_qs(parsed.query, strict_parsing=True)
+                source_id = values.get("id", [""])[0]
+                if parsed.path == "/api/source":
+                    self._serve_source(source_id)
+                else:
+                    self._send_json(HTTPStatus.OK, self.server.workspace.evidence.source_preview(source_id))
                 return
             if parsed.path == "/api/file":
                 values = parse_qs(parsed.query, strict_parsing=True)
@@ -733,6 +815,9 @@ class WorkspaceRequestHandler(BaseHTTPRequestHandler):
             return
         except WorkspaceError as exc:
             self._error(HTTPStatus.BAD_REQUEST, str(exc))
+            return
+        except (EvidenceError, OSError) as exc:
+            self._error(HTTPStatus.NOT_FOUND, str(exc))
             return
         self._error(HTTPStatus.NOT_FOUND, "not found")
 
