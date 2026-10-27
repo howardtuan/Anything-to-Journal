@@ -148,10 +148,13 @@ def safe_project_roots(project: Path, names: Iterable[str]) -> tuple[bool, str]:
 def atomic_write_text(path: Path, content: str) -> None:
     descriptor, temp_name = tempfile.mkstemp(prefix=f".{path.name}-", dir=path.parent)
     try:
-        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
-            handle.write(content)
-            handle.flush()
-            os.fsync(handle.fileno())
+        data = content.encode("utf-8")
+        try:
+            while data:
+                data = data[os.write(descriptor, data):]
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
         os.replace(temp_name, path)
     except Exception:
         try:

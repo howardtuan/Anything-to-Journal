@@ -59,7 +59,7 @@ For a named target, set `format_mode` to `target`, `venue_type` to `journal` or 
 ```json
 {
   "requirement": "Use numbered references in citation order",
-  "source": "https://official-journal.example/guide#references",
+  "source": "<official-author-guide-url>#references",
   "implemented_in": "manuscript/journal-preamble.tex and references.bib"
 }
 ```
