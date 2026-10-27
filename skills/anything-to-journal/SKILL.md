@@ -60,7 +60,7 @@ Specific venue:
 python3 <skill-dir>/scripts/prepare_workspace.py /absolute/path/fresh-folder \
   --output /absolute/path/fresh-folder/journal-output \
   --target-venue "VENUE NAME" --venue-type journal \
-  --official-guide-url "https://official.example/guide" \
+  --official-guide-url "<official-author-guide-url>" \
   --guidance-file /absolute/path/fresh-folder/official-template.zip \
   --confirmed-by "REQUESTING USER" \
   --confirmation-note "User selected the venue and authorized official-guide retrieval."
@@ -144,7 +144,7 @@ After the LaTeX, PDF, references, reports, audit evidence, and submission files 
 python3 <skill-dir>/scripts/workspace_editor.py /absolute/path/fresh-folder/journal-output
 ```
 
-Keep the process alive and capture the printed `http://127.0.0.1:PORT` URL. The server binds only to `127.0.0.1`; it does not upload the manuscript or use a CDN. `--port 0` is the default and chooses a free port. Use `--open-browser` only when the user wants the operating system's default browser opened as well.
+Keep the process alive and capture the printed local Workspace address (`127.0.0.1:<port>`). The server binds only to `127.0.0.1`; it does not upload the manuscript or use a CDN. `--port 0` is the default and chooses a free port. Use `--open-browser` only when the user wants the operating system's default browser opened as well.
 
 The Workspace defaults to **PDF Preview** and offers a **LaTeX** tab. The editor reads and writes the real files in `journal-output/manuscript/`, especially `manuscript.tex`, and discovers the other flat `.tex` and `.bib` files. It does not make an editor-only copy. Saving uses a short debounce and a shell-escape-disabled preview compile; a successful compile atomically replaces the preview, while a failed compile keeps the last successful PDF.
 
@@ -166,7 +166,7 @@ You can now make final edits:
    - PDF Preview
    - LaTeX editing
 2. Open the same Workspace in any browser:
-   http://127.0.0.1:PORT
+   <printed local Workspace address>
 
 You can edit LaTeX directly or continue asking me for changes in chat.
 Both edit the same manuscript files and regenerate the PDF preview.

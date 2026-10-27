@@ -11,6 +11,7 @@ import os
 import re
 import signal
 import shutil
+import io
 import subprocess
 import sys
 import tempfile
@@ -179,8 +180,9 @@ EVIDENCE_FIELDS = [
 
 
 def write_evidence_map(path: Path) -> None:
-    with path.open("w", encoding="utf-8-sig", newline="") as handle:
-        csv.DictWriter(handle, fieldnames=EVIDENCE_FIELDS).writeheader()
+    buffer = io.StringIO(newline="")
+    csv.DictWriter(buffer, fieldnames=EVIDENCE_FIELDS).writeheader()
+    path.write_bytes(buffer.getvalue().encode("utf-8-sig"))
     write_json(path.with_name("evidence-locations.json"), {"schema_version": "1.0", "claims": []})
 
 
@@ -458,10 +460,11 @@ def normalized_csv(text: str) -> str:
 
 
 def write_traceability(path: Path, rows: list[dict[str, str]]) -> None:
-    with path.open("w", encoding="utf-8-sig", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=TRACE_FIELDS)
-        writer.writeheader()
-        writer.writerows(rows)
+    buffer = io.StringIO(newline="")
+    writer = csv.DictWriter(buffer, fieldnames=TRACE_FIELDS)
+    writer.writeheader()
+    writer.writerows(rows)
+    path.write_bytes(buffer.getvalue().encode("utf-8-sig"))
 
 
 def bounded_command(
